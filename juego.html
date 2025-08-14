@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Juego de LLM para Niños!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-principal: #FF5733; /* Naranja */
+            --color-secundario: #33C7FF; /* Azul */
+            --color-terciario: #FFD700; /* Amarillo */
+            --color-correcto: #228B22; /* Verde */
+            --color-incorrecto: #B22222; /* Rojo */
+            --color-fondo-claro: #f0f8ff; /* Blanco azulado */
+            --color-texto: #333; /* Gris oscuro */
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, var(--color-secundario), var(--color-principal));
+            color: var(--color-texto);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .contenedor-juego {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 700px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            color: var(--color-principal);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #pregunta-container {
+            margin-bottom: 25px;
+        }
+
+        #pregunta-texto {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: var(--color-texto);
+        }
+
+        .opciones-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .btn-opcion {
+            background-color: var(--color-fondo-claro);
+            border: 2px solid var(--color-secundario);
+            color: var(--color-texto);
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: 'Fredoka', sans-serif;
+            text-align: left;
+        }
+
+        .btn-opcion:hover {
+            transform: translateY(-3px);
+            background-color: var(--color-terciario);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-opcion:active {
+            transform: translateY(0);
+        }
+
+        .btn-opcion.correcta {
+            background-color: var(--color-correcto);
+            color: white;
+            border-color: var(--color-correcto);
+            animation: bounceIn 0.5s ease-in-out;
+        }
+
+        .btn-opcion.incorrecta {
+            background-color: var(--color-incorrecto);
+            color: white;
+            border-color: var(--color-incorrecto);
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        #resultado-container {
+            margin-top: 20px;
+            min-height: 50px;
+        }
+
+        .retroalimentacion {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--color-texto);
+            margin-bottom: 10px;
+        }
+
+        #siguiente-btn {
+            background-color: var(--color-principal);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #siguiente-btn:hover {
+            background-color: #e54b2d;
+        }
+
+        #siguiente-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #puntaje-container {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 20px;
+            color: var(--color-secundario);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #final-container {
+            display: none;
+            text-align: center;
+        }
+
+        #final-container h2 {
+            font-size: 2em;
+            color: var(--color-principal);
+        }
+
+        #final-container p {
+            font-size: 1.5em;
+        }
+
+        #reiniciar-btn {
+            background-color: var(--color-secundario);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        #reiniciar-btn:hover {
+            background-color: #2daae1;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contenedor-juego">
+    <h1>🧠 ¡Adivina y Aprende sobre LLM! 🚀</h1>
+    <div id="juego-container">
+        <div id="pregunta-container">
+            <p id="pregunta-texto"></p>
+            <div class="opciones-container" id="opciones-container"></div>
+        </div>
+        <div id="resultado-container">
+            <p id="retroalimentacion-texto"></p>
+        </div>
+        <button id="siguiente-btn" disabled>Siguiente 👉</button>
+        <div id="puntaje-container">Puntuación: <span id="puntaje-valor">0</span></div>
+    </div>
+    
+    <div id="final-container">
+        <h2>🎉 ¡Juego Terminado! 🎉</h2>
+        <p>Tu puntuación final es: <span id="puntaje-final-valor">0</span> / <span id="total-preguntas">10</span></p>
+        <button id="reiniciar-btn">Volver a Jugar 🔄</button>
+    </div>
+</div>
+
+<script>
+    const preguntas = [
+        {
+            pregunta: "¿Qué es un LLM?",
+            opciones: [
+                "Un juguete que habla",
+                "Un programa de computadora muy inteligente que entiende y crea texto",
+                "Un tipo de animal muy inteligente",
+                "Una aplicación para dibujar"
+            ],
+            respuesta: "Un programa de computadora muy inteligente que entiende y crea texto"
+        },
+        {
+            pregunta: "¿Cuál de las siguientes acciones NO puede hacer un LLM?",
+            opciones: [
+                "Escribir un cuento de fantasmas",
+                "Sentir emociones o tener sentimientos",
+                "Traducir una frase de español a inglés",
+                "Responder a una pregunta sobre el espacio"
+            ],
+            respuesta: "Sentir emociones o tener sentimientos"
+        },
+        {
+            pregunta: "Un LLM aprende a través de un proceso llamado 'entrenamiento'. ¿Qué significa esto?",
+            opciones: [
+                "Hacer ejercicio físico en el gimnasio",
+                "Jugar videojuegos para volverse más rápido",
+                "Leer una gran cantidad de texto y datos para aprender patrones y reglas",
+                "Ver películas para entender cómo actúan las personas"
+            ],
+            respuesta: "Leer una gran cantidad de texto y datos para aprender patrones y reglas"
+        },
+        {
+            pregunta: "¿Qué significa 'generar texto' para un LLM?",
+            opciones: [
+                "Recortar palabras de un libro",
+                "Crear oraciones, historias o poemas nuevos",
+                "Tomar una foto de un documento",
+                "Borrar palabras de una pantalla"
+            ],
+            respuesta: "Crear oraciones, historias o poemas nuevos"
+        },
+        {
+            pregunta: "Si le pides a un LLM que te cuente un chiste, ¿de dónde saca los chistes?",
+            opciones: [
+                "De una biblioteca de chistes que tiene en su memoria",
+                "Crea el chiste combinando patrones de palabras y frases que ha aprendido",
+                "Llama a un comediante para que le cuente uno",
+                "Simplemente adivina una respuesta"
+            ],
+            respuesta: "Crea el chiste combinando patrones de palabras y frases que ha aprendido"
+        },
+        {
+            pregunta: "¿Qué es la 'traducción' para un LLM?",
+            opciones: [
+                "Hacer un dibujo de algo",
+                "Pintar una pared de otro color",
+                "Cambiar palabras de un idioma a otro, como de español a inglés",
+                "Adivinar lo que alguien va a decir"
+            ],
+            respuesta: "Cambiar palabras de un idioma a otro, como de español a inglés"
+        },
+        {
+            pregunta: "¿Qué son los 'datos' para un LLM?",
+            opciones: [
+                "Comida y agua",
+                "La información, como libros y páginas web, que usa para aprender",
+                "Juguetes y juegos para divertirse",
+                "Energía eléctrica"
+            ],
+            respuesta: "La información, como libros y páginas web, que usa para aprender"
+        },
+        {
+            pregunta: "Para que un LLM te dé una respuesta útil, ¿qué necesita?",
+            opciones: [
+                "Tu número de teléfono",
+                "Una pregunta clara y específica",
+                "Que le des un regalo",
+                "Que le cantes una canción"
+            ],
+            respuesta: "Una pregunta clara y específica"
+        },
+        {
+            pregunta: "Si un LLM a veces da una respuesta incorrecta, ¿a qué se debe?",
+            opciones: [
+                "Está enojado o se aburrió",
+                "La información con la que fue entrenado era incorrecta o incompleta",
+                "El hardware de la computadora está roto",
+                "La computadora tiene un virus"
+            ],
+            respuesta: "La información con la que fue entrenado era incorrecta o incompleta"
+        },
+        {
+            pregunta: "¿Cuál es la forma más fácil de pensar en un LLM?",
+            opciones: [
+                "Como un diccionario gigante que solo conoce palabras",
+                "Como una máquina de escribir muy rápida",
+                "Como un asistente virtual que puede hablar y escribir",
+                "Como una enciclopedia gigante que no puede responder"
+            ],
+            respuesta: "Como un asistente virtual que puede hablar y escribir"
+        }
+    ];
+
+    let indicePreguntaActual = 0;
+    let puntuacion = 0;
+    let haRespondido = false;
+
+    const preguntaTexto = document.getElementById('pregunta-texto');
+    const opcionesContainer = document.getElementById('opciones-container');
+    const siguienteBtn = document.getElementById('siguiente-btn');
+    const puntuacionValor = document.getElementById('puntaje-valor');
+    const retroalimentacionTexto = document.getElementById('retroalimentacion-texto');
+    const juegoContainer = document.getElementById('juego-container');
+    const finalContainer = document.getElementById('final-container');
+    const puntajeFinalValor = document.getElementById('puntaje-final-valor');
+    const reiniciarBtn = document.getElementById('reiniciar-btn');
+    const totalPreguntasSpan = document.getElementById('total-preguntas');
+
+    totalPreguntasSpan.textContent = preguntas.length;
+
+    function cargarPregunta() {
+        if (indicePreguntaActual >= preguntas.length) {
+            mostrarResultadosFinales();
+            return;
+        }
+
+        haRespondido = false;
+        retroalimentacionTexto.textContent = '';
+        siguienteBtn.disabled = true;
+        opcionesContainer.innerHTML = '';
+        
+        const preguntaActual = preguntas[indicePreguntaActual];
+        preguntaTexto.textContent = `Pregunta ${indicePreguntaActual + 1}: ${preguntaActual.pregunta}`;
+
+        // Mezclar las opciones para que no siempre estén en el mismo orden
+        const opcionesMezcladas = [...preguntaActual.opciones].sort(() => Math.random() - 0.5);
+
+        opcionesMezcladas.forEach(opcion => {
+            const btn = document.createElement('button');
+            btn.classList.add('btn-opcion');
+            btn.textContent = opcion;
+            btn.addEventListener('click', () => manejarRespuesta(opcion, preguntaActual.respuesta, btn));
+            opcionesContainer.appendChild(btn);
+        });
+    }
+
+    function manejarRespuesta(opcionSeleccionada, respuestaCorrecta, btnSeleccionado) {
+        if (haRespondido) return;
+
+        haRespondido = true;
+        
+        const todosLosBotones = document.querySelectorAll('.btn-opcion');
+        todosLosBotones.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === respuestaCorrecta) {
+                btn.classList.add('correcta');
+            }
+        });
+
+        if (opcionSeleccionada === respuestaCorrecta) {
+            puntuacion += 10; // 10 puntos por respuesta correcta
+            puntuacionValor.textContent = puntuacion;
+            retroalimentacionTexto.textContent = '¡Correcto! 🎉';
+            retroalimentacionTexto.style.color = var(--color-correcto);
+            btnSeleccionado.classList.add('correcta');
+        } else {
+            retroalimentacionTexto.textContent = 'Incorrecto 😞';
+            retroalimentacionTexto.style.color = var(--color-incorrecto);
+            btnSeleccionado.classList.add('incorrecta');
+        }
+
+        siguienteBtn.disabled = false;
+    }
+
+    function mostrarResultadosFinales() {
+        juegoContainer.style.display = 'none';
+        finalContainer.style.display = 'block';
+        puntajeFinalValor.textContent = puntuacion;
+    }
+
+    function reiniciarJuego() {
+        indicePreguntaActual = 0;
+        puntuacion = 0;
+        puntuacionValor.textContent = puntuacion;
+        juegoContainer.style.display = 'block';
+        finalContainer.style.display = 'none';
+        cargarPregunta();
+    }
+
+    siguienteBtn.addEventListener('click', () => {
+        indicePreguntaActual++;
+        cargarPregunta();
+    });
+
+    reiniciarBtn.addEventListener('click', reiniciarJuego);
+
+    // Iniciar el juego al cargar la página
+    cargarPregunta();
+</script>
+
+</body>
+</html>
